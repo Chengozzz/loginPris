@@ -7,11 +7,19 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $busqueda = $request->busqueda;
+        $producto1= Product::where('title','LIKE','%'.$busqueda.'%')
+        ->paginate(10);
+        $data= ['title'=> $producto1, ];
+
+
+
         $products = Product::orderBy('id', 'desc')->get();
         $total = Product::count();
-        return view('admin.product.home', compact(['products', 'total']));
+       $products= Product::paginate(10);
+        return view('admin.product.home', compact('products'));
     }
 
     public function create()
@@ -20,7 +28,7 @@ class ProductController extends Controller
     }
 
     public function save(Request $request)
-    {
+    {   
         $validation = $request->validate([
             'title' => 'required',
             'category' => 'required',
@@ -74,4 +82,10 @@ class ProductController extends Controller
         }
     }
 
+    /*public function buscar(Request $request)
+    {
+        $busqueda = $request->input('query');
+        $resultados = Product::where('title', 'LIKE', "%$busqueda%")->paginate(10);
+        return view('admin/product/home', compact('resultados'));
+    }*/
 }
